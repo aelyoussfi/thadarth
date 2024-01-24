@@ -18,9 +18,10 @@ from django.core import serializers
 def post_list(request):
     posts = Post.objects.all().order_by("-id")
     serialized_posts = []
-
+    
     for post in posts:
         serialized_post = {
+            
             'id': post.id,
             'content': post.content,
             'date': post.date,
@@ -34,8 +35,12 @@ def post_list(request):
             'likesCounter':post.count_likes()
         }
         serialized_posts.append(serialized_post)
-
-    return JsonResponse({'posts': serialized_posts})
+    current_user = None
+    if request.user.is_authenticated:
+        current_user = {
+            'username': request.user.username,
+        }
+    return JsonResponse({'posts': serialized_posts,'currentUser': current_user})
 
 @login_required
 def success(request):

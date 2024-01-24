@@ -73,6 +73,7 @@ $(document).ready(function() {
   $.get("posts/", function(response) {
     var posts = response.posts //JSON.parse(response.posts);
     for (const post of posts) { 
+        
         var elt = document.getElementById("posts")
 
         var postCont = document.createElement('div')
@@ -171,7 +172,6 @@ $(document).ready(function() {
                 success: function(data) {
                     // Update the likes count on the button and/or perform other actions
                     if (data.success){
-                        console.log(data.likes_count)
 
                         $("#likesButton-"+post.id).contents().first().replaceWith(data.likes_count)
                         //$("#back-heart").hide()
@@ -232,13 +232,17 @@ $(document).ready(function(){
         
         LikesButton.appendChild(LikeButtonText)
         LikesButton.appendChild(heartIcon)
-        DeleteButton.appendChild(deleteIcon)
+        if (post.author.username == response.currentUser.username){
+            DeleteButton.appendChild(deleteIcon)
+        }
 
         PhotoPlusPost.append(profilePhotoEltContainer)
         PhotoPlusPost.append(postElt)
         PhotoPlusPost.append(usernameElt)
         interractionInfos.appendChild(LikesButton)
-        interractionInfos.appendChild(DeleteButton)
+        if (post.author.username == response.currentUser.username){
+            interractionInfos.appendChild(DeleteButton)
+        }
 
         infos.appendChild(interractionInfos)
         infos.appendChild(dateElt)
