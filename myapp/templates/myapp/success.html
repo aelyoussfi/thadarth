@@ -1,0 +1,89 @@
+{% load static %}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+
+<body class="main" onload="redirectToImage()">
+    <div class="msg" id="msg">
+        Success 
+    </div>
+    <div class="loader" id="loader"></div>
+    <div class="validation" id="validation">
+        <img src="{% static 'images/validation.svg' %}" alt="val" width="55px">
+    </div>
+    <a href="{% url 'myapp:homepage' %}" id="close">
+        <button class="return">
+            Back
+        </button>
+    </a>
+</body>
+
+<style>
+    .main{
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .loader {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #3498db;
+    width: 120px;
+    height: 120px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+    }
+    .msg{
+        margin: 20px;
+    }
+    .validation{
+        margin: 20px;
+    }
+    .close{
+        margin:20px
+    }
+    .return{
+        background-color: transparent;
+        border: solid 5px red;
+        font-size: 22px;
+    }
+</style>
+<script>
+ document.addEventListener("DOMContentLoaded", function() {
+            // Show loader for the first 2 seconds
+            document.getElementById("loader").style.display = "block";
+            document.getElementById("validation").style.display = "none";
+            document.getElementById("close").style.display = "none";
+            document.getElementById("msg").style.display = "none";
+            setTimeout(function() {
+                // Hide loader after 2 seconds
+                document.getElementById("loader").style.display = "none";
+
+                // Show other elements
+                document.getElementById("msg").style.display = "block";
+                document.getElementById("validation").style.display = "block";
+                document.getElementById("close").style.display = "block";
+            }, 2000);
+        });
+
+    // Function to redirect to the image page after a certain delay
+    // function redirectToImage() {
+    //         setTimeout(function () {
+    //             window.location.href = 'myapp/homepage.html';
+    //         }, 3000); // Redirect after 3 seconds (adjust as needed)
+    //     }
+</script>

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}  
+{% block content %}
+<style>
+    input[type='file'] {
+        color: transparent;
+     }
+</style>
+
+    <form method="post" enctype="multipart/form-data">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <button type="submit" class="btn-signup"> Submit</button>
+    </form>
+{% endblock content %} 

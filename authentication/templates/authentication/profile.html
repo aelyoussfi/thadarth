@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<style>
+    .profile-container {
+    width: 300px;
+    margin: 35px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    }
+
+    .field {
+        display: flex;
+        margin-bottom: 15px;
+    }
+
+    .key {
+        width: 120px;
+        font-weight: bold;
+    }
+
+    .value {
+        flex: 1;
+    }
+
+    .img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 15px;
+    }
+
+</style>
+<div class="profile-container">
+    <div class="field">
+        <p class="key"> first name</p>
+        <p class="value"> {{first_name}}</p>
+    </div>
+    <div class="field">
+        <p class="key"> last name</p>
+        <p class="value"> {{last_name}}</p>
+    </div>
+        {% if profile_photo %}
+        <div class="field"></div>
+            <p class="value">
+                <img src="{{ profile_photo.url }}" class="img" alt="profile photo" height="200px" width="auto">
+            </p>
+        </div>    
+        {% endif %}
+</div>
+
+    
+    <p> You want to edit profile photo? Click <a href="{% url 'edit_profile_photo' username=request.user.username %}"> here 🙂 </a></p>
+{% endblock content %}

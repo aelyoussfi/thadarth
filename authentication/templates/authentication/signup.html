@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+        
+    .main{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+    
+    }
+    #popup-container .popup {
+    display: none;
+    }
+
+    #popup-container:hover #popup {
+    display: block;
+    }
+    
+    .password-infowindow .popup-container #popup {
+        border: 1px solid green;
+        border-radius: 15px;
+        text-align: left;
+        background-color: rgb(168, 161, 153);
+        padding: 10px;
+        font-size: 10px;
+    }
+    .password-infowindow .popup-container #popup .list{
+        text-align: left;
+    }
+    .password-infowindow .popup-container .custom-input{
+    margin-top: 10px;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+    .custom-form-change-password{
+        margin: 15px;
+        text-align: center;
+}
+.errors-signup-container{
+    border: None ;
+    border-radius: 10px;
+    background-color: None;
+    color: red;
+    width: 400px;
+    text-align: left;
+}
+.button-authentication-links{
+        display: flex;
+        flex-direction: row;
+        margin-left: 10px;
+        float: right;
+    }
+    .auth-button{
+        margin-right: 10px;
+    }
+     /* Style the submit button */
+     button[type="submit"] {
+        margin-top: 10px;
+        background-color: #040506;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    button {
+        margin-top: 10px;
+        background-color: #040506;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+
+<div class="main">
+    <form method="post" class="custom-form-change-password">
+        {% csrf_token %}
+        
+        <!-- first_name -->
+        <input type="{{ form.first_name.field.widget.input_type }}"
+               id="{{ form.first_name.id_for_label }}"
+               name="{{ form.first_name.html_name }}"
+               class="custom-input"
+               placeholder="first name">
+        <!-- last_name -->
+        <input type="{{ form.last_name.field.widget.input_type }}"
+               id="{{ form.last_name.id_for_label }}"
+               name="{{ form.last_name.html_name }}"
+               class="custom-input"
+               placeholder="last name">
+        <!-- username -->
+        <input type="{{ form.username.field.widget.input_type }}"
+               id="{{ form.username.id_for_label }}"
+               name="{{ form.username.html_name }}"
+               class="custom-input"
+               placeholder="username">
+    
+        <!-- Email Address -->
+        <input type="{{ form.email.field.widget.input_type }}"
+               id="{{ form.email.id_for_label }}"
+               name="{{ form.email.html_name }}"
+               class="custom-input"
+               placeholder="Email">
+    
+        <!-- Password -->
+        <div class="password-infowindow"> 
+            <div id="popup-container" class="popup-container">
+                <input type="{{ form.password1.field.widget.input_type }}"
+                   id="{{ form.password1.id_for_label }}"
+                   name="{{ form.password1.html_name }}"
+                   class="custom-input"
+                   placeholder="Password">
+                <div id="popup" style="display: none">
+                    Your password:
+                    <lu class="list">
+                        <li>can’t be too similar to your other personal information.
+                        <li>can’t be a commonly used password.</li>
+                        <li>must contain at least 8 characters.</li>
+                        <li>password can’t be entirely numeric.</li>
+                    </lu>
+                </div>
+            </div>
+        </div>
+       
+        
+        
+        <!-- Confirm Password -->
+        <input type="{{ form.password2.field.widget.input_type }}"
+               id="{{ form.password2.id_for_label }}"
+               name="{{ form.password2.html_name }}"
+               class="custom-input"
+               placeholder="Confirm Password">
+        
+        <!-- Other Fields... -->
+        
+        <button type="submit">Sign Up</button>
+    </form>
+    <div class="errors-signup-container">
+        <p class="signup-errors">
+            {% if message %}
+                {% for field_errors in form.errors.values %}
+                <ul style="list-style: none;">
+                    {% for error in field_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+                {% endfor %}
+            {% endif %}
+        </p>
+    </div>
+</div>
+<script>
+    var e = document.getElementById('popup-container');
+    e.onmouseover = function() {
+    document.getElementById('popup').style.display = 'block';
+    }
+    e.onmouseout = function() {
+    document.getElementById('popup').style.display = 'none';
+}
+</script>
+{% endblock content %}

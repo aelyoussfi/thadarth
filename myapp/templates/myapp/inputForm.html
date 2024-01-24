@@ -1,0 +1,5 @@
+<form id="postForm" method="post" action="{% url 'myapp:homepage' %}">
+    {% csrf_token %}
+    {{ form.as_table }}
+    <input type="submit" value="Post" id="submitButton">
+</form>

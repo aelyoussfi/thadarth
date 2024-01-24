@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{% static 'myapp/css/homepage.css' %}?v=2"> 
+<div class="main-content">
+    <div class="windows">
+        <div class="menu">
+            <div class="discussion">
+                <button id="discussion-btn">
+                    Discussion
+                </button>
+            </div>
+            <div class="profile">
+                <button id="profile-btn">
+                    Profiles
+                </button>
+            </div>
+            <div class="job">
+                <button id="jobs-btn">
+                    Jobs
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="content">
+        <form id="postForm" method="post" action="{% url 'myapp:homepage' %}">
+            {% csrf_token %}
+            {{ form.as_table }}
+            <input type="submit" value="Post" id="submitButton">
+        </form>
+        
+        <div class="posts" id="posts">
+
+        </div>
+    </div>
+    <div class="profiles" id="profiles">
+        all profiles here
+    </div>
+    <div class="jobs" id="jobs">
+        all jobs here 
+    </div>
+</div>
+<script>
+    //rest form
+    
+    
+//handle menu buttons.
+    $('#discussion-btn').click(function(){
+        $('.content').show()
+        $('.profiles').hide()
+        $('.jobs').hide()
+    })
+    $('#profile-btn').click(function(){
+        $('.content').hide()
+        $('.jobs').hide()
+        $('.profiles').show()
+        
+    })
+    $('#jobs-btn').click(function(){
+        $('.content').hide()
+        $('.profiles').hide()
+        $('.jobs').show()
+    })
+//handle fisrst element to appear after page loading
+    $(document).ready(function() {
+        $('#profiles').hide();
+        $('#jobs').hide();
+    });
+//handle posts list
+$(document).ready(function() {
+  $.get("posts/", function(response) {
+    var posts = response.posts //JSON.parse(response.posts);
+    for (const post of posts) { 
+        var elt = document.getElementById("posts")
+
+        var postCont = document.createElement('div')
+        postCont.className = "post-container"
+        postCont.id = "post-container-"+post.id
+
+        // create two containers inside post-container
+        var PhotoPlusPost = document.createElement('div')
+        PhotoPlusPost.className = "PhotoPlusPost-container"
+
+        //infos container
+        var infos = document.createElement('div')
+        infos.className = "infos-container"
+
+        var usernameElt = document.createElement('div');
+        var dateElt = document.createElement('div');
+        var profilePhotoEltContainer = document.createElement('div');
+        var PImage = document.createElement('img');
+        var LikesButton = document.createElement('button');
+        var DeleteButton = document.createElement('button');
+        var deleteIcon = document.createElement('img');
+        var heartIcon = document.createElement('img')
+
+        heartIcon.src = "static/myapp/icons/heart.svg"
+        deleteIcon.src = "static/myapp/icons/delete.svg";
+
+        deleteIcon.style.width = "25px";
+        heartIcon.style.width = "28px"
+
+        DeleteButton.style.backgroundColor = "transparent";
+        DeleteButton.style.borderStyle = "none";
+        // var DeleteButtonText = document.createTextNode(deleteIcon);
+        var LikeButtonText = document.createTextNode( post.likesCounter);
+        var interractionInfos = document.createElement('div');
+        var postElt = document.createElement('div');
+
+        usernameElt.className = "username";
+        postElt.className = "post";
+        postElt.id = "post-"+post.id;
+        dateElt.className = 'date';
+        LikesButton.className = 'likesButton';
+        DeleteButton.className = 'deleteButton';
+        DeleteButton.id = 'deleteButton-'+post.id
+        LikesButton.id = 'likesButton-'+post.id;
+        LikesButton.type = 'submit';
+        interractionInfos.className = "LikesAndCo";
+        heartIcon.className = "back-heart"
+        heartIcon.id = "back-heart"
+        /*
+        posts ==> post-container ==> (PhotoPlusPost-container (profile-photo + date + post  ) + infos-container (date))
+        */
+        profilePhotoEltContainer.className = 'profile-photo'
+
+        usernameElt.textContent = post.author.username
+
+        const isoDateString = post.date;
+        const date = new Date(isoDateString);
+
+        //date & time format
+        const options = {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        timeZone: 'Africa/Casablanca'
+        };
+
+        const formattedDate = date.toLocaleString('en-US', options);
+        // end date & time format
+        dateElt.textContent = formattedDate;
+        PImage.src = '/media/' + post.author.profile_photo
+        PImage.className = "profilePhoto"
+        postElt.textContent = post.content
+        // Add the post ID as a data attribute to the LikesButton
+        LikesButton.dataset.postId = post.id;
+        DeleteButton.dataset.postId = post.id;
+// Add a click event listener to the LikesButton
+        $(LikesButton).on('click', function() {
+            // Retrieve the post ID from the data attribute
+            
+            var postId = this.dataset.postId;
+
+            // Make an AJAX request to handle the like functionality
+            $.ajax({
+                url: '/like-post/',
+                type: 'POST',
+                data: {
+                    'post_id': postId
+                },
+                beforeSend: function(xhr, settings) {
+                        // Include the CSRF token in the request headers
+                        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                    },
+                success: function(data) {
+                    // Update the likes count on the button and/or perform other actions
+                    if (data.success){
+                        console.log(data.likes_count)
+
+                        $("#likesButton-"+post.id).contents().first().replaceWith(data.likes_count)
+                        //$("#back-heart").hide()
+                    
+                    }
+                },
+                error: function(error) {
+                    console.log('Error:', error);
+                }
+            });
+        })
+        
+//handle deleting a post
+$(document).ready(function(){
+    // Attach a click event to the deleteButton
+    $('#posts').on('click', '.deleteButton', function() {
+        // Retrieve the post ID from the data attribute
+        var postId = this.dataset.postId;
+
+        // Make an AJAX request to handle the delete functionality
+        $.ajax({
+            url: '/delete-post/',
+            type: 'POST',
+            data: {
+                'post_id': postId,
+            },
+            beforeSend: function(xhr, settings) {
+                // Include the CSRF token in the request headers
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            },
+            success: function(data) {
+                // Update the likes count on the button and/or perform other actions
+                if (data.message == "post deleted"){
+                    // Hide the specific post element after successful deletion
+                    $('#post-container-' + postId).hide();
+                }
+                else{
+                    console.log('error')
+                }
+                
+            },
+            error: function(error) {
+                console.log('Error:', error);
+            }
+        });
+    });
+});
+
+
+
+        profilePhotoEltContainer.appendChild(PImage)
+        //style imae
+        PImage.style.width = "35px";
+        PImage.style.height = '35px';
+        PImage.style.borderRadius = "25px";
+        PImage.style.marginRight = "5px";
+        PImage.style.marginLeft = "5px";
+        
+        LikesButton.appendChild(LikeButtonText)
+        LikesButton.appendChild(heartIcon)
+        DeleteButton.appendChild(deleteIcon)
+
+        PhotoPlusPost.append(profilePhotoEltContainer)
+        PhotoPlusPost.append(postElt)
+        PhotoPlusPost.append(usernameElt)
+        interractionInfos.appendChild(LikesButton)
+        interractionInfos.appendChild(DeleteButton)
+
+        infos.appendChild(interractionInfos)
+        infos.appendChild(dateElt)
+
+        postCont.appendChild(PhotoPlusPost)
+        postCont.appendChild(infos)
+        elt.appendChild(postCont)
+
+      
+    }
+  }); 
+});
+document.getElementById('postForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent the default form submission
+        // Your custom logic to submit the form when the button is clicked
+        if (event.submitter && event.submitter.id === 'submitButton') {
+            this.submit(); // Submit the form
+        }
+    });
+// Function to get the CSRF token from the cookie
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Check if this cookie string begins with the name we want
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+</script>
+{% endblock content %}

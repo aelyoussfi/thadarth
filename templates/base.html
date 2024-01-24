@@ -1,0 +1,61 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/base.css' %}?v=2"> 
+<html>
+    <head>
+        <title>Pyjob</title>
+    </head>
+    <body>
+        <header class="header">
+            <div class="header-wrapper">
+                <div class="logo">
+                    <a href="{% url 'myapp:homepage'  %}">
+                        <img src="{% static 'images/1.png' %}" alt="logo" class="logo-image">
+                    </a>
+                </div>
+                {% if user.is_authenticated %}
+                <div class="dropdown">
+    
+                    
+                    <div class="profile_photo-username">
+                        <div class="profile-photo">
+                            {% if user.profile_photo %}
+                                <a href="{% url 'profile-page' username=user.username %}">
+                                    <img src= {{ user.profile_photo.url }} alt="profile-photo" class="img-profile" height="50px" width="auto">
+        
+                                </a>
+                            {% else %}
+                                <a href="{% url 'profile-page' username=user.username %}">
+                                    <img src="{% static 'images/default_profile.png' %}" alt="avatar" class="img-profile" height="50px" width="auto">
+                                </a>
+                            {% endif %}
+                        </div>
+                        
+                    </div>
+                    <div class="dropdown-content">
+                        <div class="auth-button">
+                            <p>Hello {{user.username}}</p>
+                        </div> 
+                        <div class="auth-button">
+                            <a href={% url 'logout' %} style="color: #040506;">
+                                Logout
+                            </a>
+                        </div>
+                        <div class="auth-button">
+                            <a href={% url 'password_change' %} style="color: #040506;">
+                                Change Password 
+                            </a>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+                {% endif %}
+            </div>       
+        </header>
+                        {% block content %}{% endblock %}
+
+        <footer>
+                things
+        </footer>
+    </body>
+</html>
